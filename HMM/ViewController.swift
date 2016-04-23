@@ -256,6 +256,8 @@ extension ViewController: UITableViewDelegate,UITableViewDataSource{
                 cell = UITableViewCell(style: .Value1, reuseIdentifier: "CellID_L")
             }
         }
+        cell?.textLabel?.font = UIFont.preferredFontForTextStyle("UIFontTextStyleBody")
+        cell?.detailTextLabel?.font = UIFont.preferredFontForTextStyle("UIFontTextStyleCaption1")
         let user = userList[indexPath.row]
         cell?.textLabel?.text = "Name:\(user.name!)"
         let mobiles = user.mobiles
