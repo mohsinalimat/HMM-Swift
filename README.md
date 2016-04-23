@@ -9,17 +9,17 @@
 
 
 #### `模型:`
-![image](https://github.com/iFallen/HMM-Swift.git/raw/master/ScreenShots/Model.png)
+![image](https://github.com/iFallen/HMM-Swift/raw/master/ScreenShots/Model.png)
 
 #### `效果图:`
 
-![image](https://github.com/iFallen/HMM-Swift.git/raw/master/ScreenShots/Add.png)
+![image](https://github.com/iFallen/HMM-Swift/raw/master/ScreenShots/Add.png)
 
-![image](https://github.com/iFallen/HMM-Swift.git/raw/master/ScreenShots/Update.png)
+![image](https://github.com/iFallen/HMM-Swift/raw/master/ScreenShots/Update.png)
 
-![image](https://github.com/iFallen/HMM-Swift.git/raw/master/ScreenShots/Delete.png)
+![image](https://github.com/iFallen/HMM-Swift/raw/master/ScreenShots/Delete.png)
 
-![image](https://github.com/iFallen/HMM-Swift.git/raw/master/ScreenShots/Landscape.png)
+![image](https://github.com/iFallen/HMM-Swift/raw/master/ScreenShots/Landscape.png)
 
 ---
 
