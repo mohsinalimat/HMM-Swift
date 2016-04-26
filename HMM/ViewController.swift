@@ -55,18 +55,6 @@ class ViewController: UIViewController {
             tblUserList.reloadData()
         }
     }
-    
-    //弹出修改用户名Alert
-    func showUpdateConotrol(oldName:String,newName:String) {
-        if newName.isEmpty {
-            let alert = UIAlertController(title: "Info", message: "Message cannot be empty", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }else{
-            updateUserName(oldName,newName: newName)
-        }
-    }
-    
     //插入数据
     func insertANewData(userName:String,mobileName:String) {
         let context = self.getManagedObjectContext()
@@ -108,28 +96,7 @@ class ViewController: UIViewController {
             print("fetch data failed:\(error)")
         }
     }
-    //修改用户名
-    func updateUserName(oldName:String,newName:String) {
-        let context = self.getManagedObjectContext()
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        let predicate = NSPredicate(format: "name=%@", oldName)
-        fetchRequest.predicate = predicate
-        do{
-            let userList = try context.executeFetchRequest(fetchRequest)
-            if let users = userList as? [User] {
-                for user in users {
-                    user.name = newName
-                }
-                try context.save()
-                print("\(users.count) data updated...")
-            }else{
-                print("no data need update...")
-            }
-        }catch {
-            print("update data failed:\(error)")
-        }
-    }
-    //删除用户
+    //根据数据ID删除用户
     func deleteAUser(objID:NSManagedObjectID) {
         let context = self.getManagedObjectContext()
         let fetchRequest = NSFetchRequest(entityName: "User")
@@ -152,77 +119,6 @@ class ViewController: UIViewController {
             print("delete data failed:\(error)")
         }
     }
-    
-    /*
-    //MARK: Test
-    // 不通过Model 的 插入 查询 删除 修改
-    func insertNewData(userName:String,mobileName:String) {
-        let context = self.getManagedObjectContext()
-        //        NSManagedObject(entity: NSEntityDescription, insertIntoManagedObjectContext: NSManagedObjectContext?)
-        let aUser = NSEntityDescription.insertNewObjectForEntityForName("User", inManagedObjectContext: context)
-        aUser.setValue(userName, forKey: "name")
-        aUser.setValue(1, forKey: "sex")
-        aUser.setValue("天府大道北段", forKey: "address")
-        do{
-            try context.save()
-        }catch{
-            print("insert failed:\(error)")
-        }
-    }
-    
-    func fetchUserList(){
-        let context = self.getManagedObjectContext()
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        do{
-            let userlist = try context.executeFetchRequest(fetchRequest)
-            if let users = userlist as? [NSManagedObject] {
-                for user in users {
-                    print("Name:\(user.valueForKey("name")!)")
-                    print("Sex:\(user.valueForKey("sex"))!")
-                    print("Address:\(user.valueForKey("address"))!")
-                }
-            }
-        }catch{
-            print("fetch failed:\(error)")
-        }
-    }
-    
-    func deleteByUserName(userName:String) {
-        let context = self.getManagedObjectContext()
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        let predicate = NSPredicate(format: "name=%@",userName)
-        fetchRequest.predicate = predicate
-        do{
-            let userList = try context.executeFetchRequest(fetchRequest)
-            if let users = userList as? [NSManagedObject] {
-                for user in users {
-                    context.deleteObject(user)
-                }
-                try context.save()
-            }
-        }catch{
-            print("delete failed:\(error)")
-        }
-    }
-    
-    func updateUserAddressByUserName(userName:String,address:String) {
-        let context = self.getManagedObjectContext()
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        let predicate = NSPredicate(format: "name=%@",userName)
-        fetchRequest.predicate = predicate
-        do{
-            let userList = try context.executeFetchRequest(fetchRequest)
-            if let users = userList as? [NSManagedObject] {
-                for user in users {
-                    user.setValue(address, forKey: "address")
-                }
-                try context.save()
-            }
-        }catch{
-            print("delete failed:\(error)")
-        }
-    }
-     */
     
     func getManagedObjectContext() -> NSManagedObjectContext {
         let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -288,9 +184,23 @@ extension ViewController: UITableViewDelegate,UITableViewDataSource{
                 if text == user.name {
                     print("无需更新...")
                 }else{
-                    self.showUpdateConotrol(user.name!,newName: (txtF1?.text)!)
-                    user.name = text
-                    self.tblUserList.reloadData()
+                    
+                    if (txtF1?.text)!.isEmpty {
+                        let alert = UIAlertController(title: "Info", message: "Message cannot be empty", preferredStyle: .Alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                        self.presentViewController(alert, animated: true, completion: nil)
+                    }else {
+                        let context = self.getManagedObjectContext()
+                        //修改用户名信息
+                        do{
+                            user.name = text
+                            //保存 执行操作
+                            try context.save()
+                            self.tblUserList.reloadData()
+                        }catch{
+                            print("update data failed...")
+                        }
+                    }
                 }
             }
         }))
@@ -299,10 +209,19 @@ extension ViewController: UITableViewDelegate,UITableViewDataSource{
     //删除某条用户数据
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let user = userList[indexPath.row]
-            deleteAUser(user.objectID)
-            userList.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            //直接删除
+            do{
+                let user = userList[indexPath.row]
+                let context = self.getManagedObjectContext()
+                context.deleteObject(user)
+                try context.save()
+                userList.removeAtIndex(indexPath.row)
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            }catch{
+                print("delete failed...")
+            }
+            //根据对象ID 检索后 并删除
+            //deleteAUser(user.objectID)
         }
     }
     
