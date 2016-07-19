@@ -72,6 +72,7 @@ class ViewController: UIViewController {
         user.address = "天府大道北段1480号"
         user.sex = arc4random() % 2 == 0 ? 1 : 2
         //设置User mobiles
+        //user.addMobileObjects
         user.mobiles = NSOrderedSet(array: [mobile1,mobile2])
         do{
             //存储数据
